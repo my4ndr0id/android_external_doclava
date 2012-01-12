@@ -462,7 +462,22 @@ public class Comment {
         mHidden = 0;
         return false;
       }
-      boolean b = mText.indexOf("@hide") >= 0 || mText.indexOf("@pending") >= 0;
+      // Make a copy of the string mText before searching it.
+      // It seems as though some versions of Java get confused about
+      // where the end of the string is and this is causing random
+      // failures in the check below.  Specifically, in some builds
+      // of the same tree the indexOf method returns offsets beyond
+      // the end of the string mText when processing the Intent class.
+      // After thousands of builds this issue was identified and
+      // resolved in gingerbread.  While this failure is seen much
+      // less frequently in ice cream sandwich it has been
+      // spotted a few times.
+      // Note this appears to be a bug in Java itself, not that
+      // this code was wrong per se.  However, the workaround
+      // here is straightforward and further analysis into Java
+      // would be difficult and time consuming.
+      String toSearch = new String(mText);
+      boolean b = toSearch.indexOf("@hide") >= 0 || toSearch.indexOf("@pending") >= 0;
       mHidden = b ? 1 : 0;
       return b;
     }
